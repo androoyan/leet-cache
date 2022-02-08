@@ -1,0 +1,96 @@
+body {
+  font-family: "Sriracha";
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  padding: 0;
+}
+
+ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+button {
+  font-family: inherit;
+}
+
+#App {
+  margin-left: 20px;
+  margin-right: 20px;
+  margin-bottom: 10px;
+}
+
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#header-logo {
+  display: flex;
+}
+
+#header-title {
+  align-self: end;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+#card-container {
+  display: flex;
+  flex-direction: column;
+}
+
+#card-title {
+  align-self: center;
+  padding-bottom: 5px;
+}
+
+#card-buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding-bottom: 5px;
+}
+
+.button {
+  border-color: black;
+  border-radius: 5px;
+  color: white;
+  font-size: 20px;
+  line-height: 30px;
+}
+
+.button-hard {
+  background-color: #ff6961;
+}
+
+.button-good {
+  background-color: #8ed3f3;
+}
+
+.button-easy {
+  background-color: #77dd77;
+}
+
+#card-list {
+  text-align: center;
+}
+
+#problems-due {
+  padding-left: 15px;
+}
+
+.card-list-problem-titles {
+  list-style-type: square;
+  text-align: left;
+}
