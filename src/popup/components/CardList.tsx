@@ -3,16 +3,16 @@ import browser from "webextension-polyfill";
 import { Problem } from "../../types";
 
 const CardList = ({ problemsDue }: { problemsDue: Problem[] }) => {
-  const handleClick = (event: React.MouseEvent) => {
+  const handleClick = async (event: React.MouseEvent): Promise<void> => {
     event.preventDefault();
     const element = event.target as HTMLAnchorElement;
     const url = element.href;
-    browser.tabs.update({ url });
+    await browser.tabs.update({ url });
     window.close();
   };
 
   return (
-    <div id="card-list">
+    <div id="card-list-container">
       {problemsDue.length !== 0 ? (
         <div id="problems-due">
           <h3>PROBLEMS DUE!</h3>

@@ -1,6 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
-import "@fontsource/sriracha";
+import "@fontsource/patrick-hand";
 import "./index.css";
 import Popup from "./Popup";
 

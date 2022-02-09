@@ -1,12 +1,14 @@
-import browser from "webextension-polyfill";
+import base64js from "base64-js";
+import pako from "pako";
 import initSqlJs, { Database } from "sql.js";
+import browser from "webextension-polyfill";
 
 import { isEmpty } from "../utils";
 
 export const getDatabase = async (): Promise<Database> => {
   try {
     const SQL = await initSqlJs();
-    const results = await browser.storage.local.get("binaryArr");
+    const results = await browser.storage.local.get("base64Str");
     if (isEmpty(results)) {
       const database = new SQL.Database();
       database.exec(
@@ -14,7 +16,9 @@ export const getDatabase = async (): Promise<Database> => {
       );
       return database;
     } else {
-      return new SQL.Database(results["binaryArr"]);
+      const gzipArr = base64js.toByteArray(results["base64Str"]);
+      const ungzipArr = pako.ungzip(gzipArr);
+      return new SQL.Database(ungzipArr);
     }
   } catch (e) {
     throw e;
@@ -33,7 +37,9 @@ export const updateDatabase = async (
     db.exec(<string>queryObj.queryStr, <(number | string)[]>queryObj.paramsArr);
 
     const binaryArr = db.export();
-    await browser.storage.local.set({ binaryArr });
+    const gzipArr = pako.gzip(binaryArr);
+    const base64Str = base64js.fromByteArray(gzipArr);
+    await browser.storage.local.set({ base64Str });
   } catch (e) {
     throw e;
   } finally {

@@ -1,5 +1,5 @@
 body {
-  font-family: "Sriracha";
+  font-family: "Patrick Hand";
 }
 
 h1,
@@ -54,7 +54,7 @@ button {
   padding-bottom: 5px;
 }
 
-#card-buttons {
+#card-buttons-container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -62,7 +62,7 @@ button {
   padding-bottom: 5px;
 }
 
-.button {
+.card-btn {
   border-color: black;
   border-radius: 5px;
   color: white;
@@ -70,19 +70,19 @@ button {
   line-height: 30px;
 }
 
-.button-hard {
+#btn-hard {
   background-color: #ff6961;
 }
 
-.button-good {
+#btn-good {
   background-color: #8ed3f3;
 }
 
-.button-easy {
+#btn-easy {
   background-color: #77dd77;
 }
 
-#card-list {
+#card-list-container {
   text-align: center;
 }
 

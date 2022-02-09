@@ -1,5 +1,5 @@
-import { sendBackgroundMessage } from "../utils";
 import { Problem } from "../../types";
+import { sendBackgroundMessage } from "../utils";
 
 const Card = ({
   problem,
@@ -13,7 +13,7 @@ const Card = ({
       const target = event.target as HTMLButtonElement;
       const updatedProblem: Problem = {
         title: problem.title,
-        difficulty: target.id,
+        difficulty: target.value,
       };
       await sendBackgroundMessage("updateCardReview", updatedProblem);
       reviewedCard(problem.title);
@@ -28,34 +28,35 @@ const Card = ({
         <h2>{problem.title}</h2>
       </div>
 
-      <form id="card-form">
-        <div id="card-buttons">
-          <button
-            type="button"
-            id="hard"
-            className="button button-hard"
-            onClick={handleClick}
-          >
-            Hard
-          </button>
-          <button
-            type="button"
-            id="good"
-            className="button button-good"
-            onClick={handleClick}
-          >
-            Good
-          </button>
-          <button
-            type="button"
-            id="easy"
-            className="button button-easy"
-            onClick={handleClick}
-          >
-            Easy
-          </button>
-        </div>
-      </form>
+      <div id="card-buttons-container">
+        <button
+          type="button"
+          id="btn-hard"
+          className="card-btn"
+          value="hard"
+          onClick={handleClick}
+        >
+          Hard
+        </button>
+        <button
+          type="button"
+          id="btn-good"
+          className="card-btn"
+          value="good"
+          onClick={handleClick}
+        >
+          Good
+        </button>
+        <button
+          type="button"
+          id="btn-easy"
+          className="card-btn"
+          value="easy"
+          onClick={handleClick}
+        >
+          Easy
+        </button>
+      </div>
     </div>
   );
 };

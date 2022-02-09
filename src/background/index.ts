@@ -1,3 +1,5 @@
+import base64js from "base64-js";
+import pako from "pako";
 import browser from "webextension-polyfill";
 
 import { getDatabase, updateDatabase } from "./database";
@@ -64,7 +66,9 @@ const getProblemData = async (
       ]);
 
       const binaryArr = db.export();
-      await browser.storage.local.set({ binaryArr });
+      const gzipArr = pako.gzip(binaryArr);
+      const base64Str = base64js.fromByteArray(gzipArr);
+      await browser.storage.local.set({ base64Str });
 
       return <Problem>{ title, difficulty };
     }
@@ -193,10 +197,6 @@ const updateCardReview = async (problem: Problem): Promise<string> => {
       interval: interval,
     };
     await updateDatabase(problem.title, params);
-
-    // TODO: RESET storage in separate function
-    //await browser.storage.local.clear();
-    //console.log(await browser.storage.local.get(null));
 
     return Promise.resolve("Successfully updated card review information");
   } catch (e) {
