@@ -1,4 +1,5 @@
-import logo from "../../assets/icons/leet-cache-48x48.png";
+import logo from "../../../assets/icons/leet-cache-48x48.png";
+import "./Header.css";
 
 const Header = () => {
   return (

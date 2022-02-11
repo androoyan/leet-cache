@@ -22,6 +22,19 @@ const Card = ({
     }
   };
 
+  const editCard = async () => {
+    const editProblem: Problem = { title: problem.title, notes: problem.notes };
+    await sendBackgroundMessage("editProblemNotes", editProblem);
+    //const popup = window.open(
+    //  browser.runtime.getURL("popup.html"),
+    //  "HELLO",
+    //  "width=400,height=400"
+    //);
+    //if (popup !== null) {
+    //  popup.document.write(ReactDOMServer.renderToString(<Header />));
+    //}
+  };
+
   return (
     <div id="card-container">
       <div id="card-title">
@@ -57,6 +70,9 @@ const Card = ({
           Easy
         </button>
       </div>
+      <button type="button" onClick={editCard}>
+        EDIT
+      </button>
     </div>
   );
 };

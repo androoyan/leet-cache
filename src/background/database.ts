@@ -28,7 +28,7 @@ export const getDatabase = async (): Promise<Database> => {
 export const updateDatabase = async (
   title: string,
   params: { [index: string]: number | string }
-): Promise<void> => {
+): Promise<boolean> => {
   const queryObj = generateUpdateQuery(title, params);
 
   let db = null;
@@ -40,6 +40,7 @@ export const updateDatabase = async (
     const gzipArr = pako.gzip(binaryArr);
     const base64Str = base64js.fromByteArray(gzipArr);
     await browser.storage.local.set({ base64Str });
+    return true;
   } catch (e) {
     throw e;
   } finally {

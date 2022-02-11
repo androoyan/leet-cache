@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import Card from "./components/Card";
 import CardList from "./components/CardList";
-import Header from "./components/Header";
+import Header from "./components/Header/Header";
 import { sendBackgroundMessage } from "./utils";
 
 import { Problem } from "../types";

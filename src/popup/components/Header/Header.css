@@ -1,0 +1,20 @@
+#header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#header-logo {
+  display: flex;
+}
+
+#header-title {
+  align-self: end;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+hr {
+  border: 1px solid black;
+  width: 100%;
+}

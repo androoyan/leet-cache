@@ -6,6 +6,7 @@ module.exports = {
   entry: {
     background: "./src/background/index.ts",
     contentScript: "./src/content/index.ts",
+    edit: "./src/popup/pages/Edit/index.tsx",
     options: "./src/options/index.tsx",
     popup: "./src/popup/index.tsx",
   },
@@ -42,6 +43,11 @@ module.exports = {
     },
   },
   plugins: [
+    new HtmlWebpackPlugin({
+      chunks: ["edit"],
+      filename: "edit.html",
+      template: "./src/popup/pages/Edit/index.html",
+    }),
     new HtmlWebpackPlugin({
       chunks: ["options"],
       filename: "options.html",

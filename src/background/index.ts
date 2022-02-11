@@ -8,16 +8,22 @@ import { Message, Problem } from "../types";
 const SECS_IN_DAY = 86400;
 const HARD_PENALTY = 1.2;
 const EASY_BONUS = 1.3;
+const EASE_FACTOR = 0.15;
+
+const DEFAULT_DUE = null;
+const DEFAULT_EASE = 2.5;
+const DEFAULT_INTERVAL = 7;
+const DEFAULT_NOTES = "";
 
 const getTabID = async (): Promise<number> => {
   try {
     const tabs = await browser.tabs.query({ active: true, currentWindow: true });
     if (tabs[0].id === undefined) {
-      throw new Error();
+      throw new Error("TabError: unable to get tab ID");
     }
     return tabs[0].id;
-  } catch {
-    throw new Error("TabError");
+  } catch (e) {
+    throw e;
   }
 };
 
@@ -50,7 +56,7 @@ const getProblemData = async (
   try {
     db = await getDatabase();
     const results = db.exec(
-      "SELECT difficulty, due, pathname FROM problems WHERE title=?;",
+      "SELECT difficulty, due, pathname, notes FROM problems WHERE title=?;",
       [title]
     );
 
@@ -59,10 +65,10 @@ const getProblemData = async (
         title,
         difficulty,
         pathname,
-        null,
-        2.5,
-        7,
-        null,
+        DEFAULT_DUE,
+        DEFAULT_EASE,
+        DEFAULT_INTERVAL,
+        DEFAULT_NOTES,
       ]);
 
       const binaryArr = db.export();
@@ -78,6 +84,7 @@ const getProblemData = async (
       difficulty: results[0].values[0][0],
       due: results[0].values[0][1],
       pathname: results[0].values[0][2],
+      notes: results[0].values[0][3],
     };
   } catch (e) {
     return Promise.reject(new Error(`Error inserting into database: ${e}`));
@@ -91,7 +98,7 @@ const getProblemData = async (
 const getProblem = async (): Promise<Problem | null> => {
   let problem = null;
   try {
-    const contentProblem = await sendContentMessage("getProblem");
+    const contentProblem: Problem = await sendContentMessage("getProblem");
     if (
       contentProblem.title !== null &&
       contentProblem.difficulty !== undefined &&
@@ -107,6 +114,7 @@ const getProblem = async (): Promise<Problem | null> => {
     // Absorb error if content script not injected aka tab not on a valid
     // leetcode problem else we throw error up the stack
     if (e.message !== "ContentConnectionError") {
+      console.error(e); // TODO
       throw e;
     }
   } finally {
@@ -135,6 +143,7 @@ const getProblemsDue = async (): Promise<Problem[]> => {
     });
     return problems;
   } catch (e) {
+    console.error(e); // TODO
     throw e;
   } finally {
     if (db !== null) {
@@ -149,6 +158,7 @@ const getCards = async (): Promise<object> => {
     const problemsDue: Problem[] = await getProblemsDue();
     return { problem, problemsDue };
   } catch (e) {
+    console.error(e); // TODO
     throw e;
   }
 };
@@ -177,7 +187,7 @@ const updateCardReview = async (problem: Problem): Promise<string> => {
     switch (problem.difficulty) {
       case "hard":
         interval *= HARD_PENALTY;
-        ease -= 0.15;
+        ease -= EASE_FACTOR;
         break;
       case "good":
         interval *= ease;
@@ -185,7 +195,7 @@ const updateCardReview = async (problem: Problem): Promise<string> => {
         break;
       case "easy":
         interval *= ease * EASY_BONUS;
-        ease += 0.15;
+        ease += EASE_FACTOR;
         break;
     }
     due = today + interval * SECS_IN_DAY;
@@ -208,7 +218,43 @@ const updateCardReview = async (problem: Problem): Promise<string> => {
   }
 };
 
-const parseMessageFromPopup = (message: Message): Promise<object | string> => {
+const openEditPopup = async (
+  editProblem: Problem
+): Promise<browser.Windows.Window> => {
+  try {
+    await browser.storage.local.set({ editProblem });
+    const popup = await browser.windows.create({
+      url: browser.runtime.getURL("edit.html"),
+      type: "popup",
+      height: 400,
+      width: 400,
+    });
+    return popup;
+  } catch (e) {
+    throw e;
+  }
+};
+
+const getEditProblem = async (): Promise<Record<string, any>> => {
+  return await browser.storage.local.get("editProblem");
+};
+
+const updateCardNotes = async (problem: Problem): Promise<boolean> => {
+  try {
+    if (problem.title !== null && problem.notes !== undefined) {
+      return await updateDatabase(problem.title, {
+        notes: problem.notes,
+      });
+    }
+    throw new Error("Problem title or notes undefined/null");
+  } catch (e) {
+    throw e;
+  }
+};
+
+const parseMessageFromPopup = (
+  message: Message
+): Promise<Problem | object | boolean | string | null | void> => {
   if (message.subject === "popupMounted") {
     return getCards();
   } else if (message.subject === "updateCardReview") {
@@ -218,11 +264,27 @@ const parseMessageFromPopup = (message: Message): Promise<object | string> => {
     return Promise.reject(
       new Error("Background: problem is undefined when updating card review")
     );
+  } else if (message.subject === "editMounted") {
+    return getEditProblem();
+  } else if (message.subject === "editProblemNotes") {
+    if (message.problem !== undefined) {
+      return openEditPopup(message.problem);
+    }
+    return Promise.reject(
+      new Error("Background: problem is undefined when editing card notes")
+    );
+  } else if (message.subject === "updateCardNotes") {
+    if (message.problem !== undefined) {
+      return updateCardNotes(message.problem);
+    }
   }
+
   return Promise.reject(new Error("Background: unexpected message subject"));
 };
 
-const parseMessage = (message: Message): Promise<object | string> => {
+const parseMessage = (
+  message: Message
+): Promise<Problem | object | boolean | string | null | void> => {
   if (message.from === "popup") {
     return parseMessageFromPopup(message);
   }
