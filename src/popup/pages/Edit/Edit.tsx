@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import browser from "webextension-polyfill";
 
 import Header from "../../components/Header/Header";
 import { sendBackgroundMessage } from "../../utils";
@@ -10,16 +11,12 @@ const Edit = () => {
   const [editProblem, setEditProblem] = useState<Problem | null>(null);
 
   useEffect(() => {
-    const getProblem = async (): Promise<void> => {
-      const results = await sendBackgroundMessage("editMounted");
-      if (results.editProblem !== null) {
-        setEditProblem(results.editProblem);
+    browser.runtime.onMessage.addListener((message) => {
+      if (message.from === "background" && message.subject === "editProblem") {
+        setEditProblem(message.problem);
+        setIsLoading(false);
       }
-    };
-
-    getProblem()
-      .catch(console.error)
-      .finally(() => setIsLoading(false));
+    });
   }, []);
 
   const handleChange = (event: React.ChangeEvent): void => {

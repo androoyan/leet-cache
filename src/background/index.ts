@@ -163,7 +163,7 @@ const getCards = async (): Promise<object> => {
   }
 };
 
-const updateCardReview = async (problem: Problem): Promise<string> => {
+const updateCardReview = async (problem: Problem): Promise<boolean> => {
   if (problem.title === null) {
     throw new Error("Title is null");
   } else if (problem.difficulty === null || problem.difficulty === undefined) {
@@ -208,9 +208,9 @@ const updateCardReview = async (problem: Problem): Promise<string> => {
     };
     await updateDatabase(problem.title, params);
 
-    return Promise.resolve("Successfully updated card review information");
+    return true;
   } catch (e) {
-    return Promise.reject(e);
+    throw e;
   } finally {
     if (db !== null) {
       db.close();
@@ -218,25 +218,36 @@ const updateCardReview = async (problem: Problem): Promise<string> => {
   }
 };
 
-const openEditPopup = async (
-  editProblem: Problem
-): Promise<browser.Windows.Window> => {
+const openEditPopup = async (editProblem: Problem): Promise<any> => {
   try {
-    await browser.storage.local.set({ editProblem });
     const popup = await browser.windows.create({
       url: browser.runtime.getURL("edit.html"),
       type: "popup",
       height: 400,
-      width: 400,
+      width: 500,
     });
+
+    browser.tabs.onUpdated.addListener(
+      function listener(tabID, changeInfo) {
+        if (popup.tabs !== undefined && popup.tabs[0].id !== undefined) {
+          if (changeInfo.status === "complete" && popup.tabs[0].id === tabID) {
+            browser.tabs.onUpdated.removeListener(listener);
+
+            const message: Message = {
+              from: "background",
+              subject: "editProblem",
+              problem: editProblem,
+            };
+            browser.tabs.sendMessage(tabID, message);
+          }
+        }
+      },
+      { properties: ["status"] }
+    );
     return popup;
   } catch (e) {
     throw e;
   }
-};
-
-const getEditProblem = async (): Promise<Record<string, any>> => {
-  return await browser.storage.local.get("editProblem");
 };
 
 const updateCardNotes = async (problem: Problem): Promise<boolean> => {
@@ -254,7 +265,7 @@ const updateCardNotes = async (problem: Problem): Promise<boolean> => {
 
 const parseMessageFromPopup = (
   message: Message
-): Promise<Problem | object | boolean | string | null | void> => {
+): Promise<Problem | object | boolean | null> => {
   if (message.subject === "popupMounted") {
     return getCards();
   } else if (message.subject === "updateCardReview") {
@@ -264,8 +275,6 @@ const parseMessageFromPopup = (
     return Promise.reject(
       new Error("Background: problem is undefined when updating card review")
     );
-  } else if (message.subject === "editMounted") {
-    return getEditProblem();
   } else if (message.subject === "editProblemNotes") {
     if (message.problem !== undefined) {
       return openEditPopup(message.problem);
@@ -284,7 +293,7 @@ const parseMessageFromPopup = (
 
 const parseMessage = (
   message: Message
-): Promise<Problem | object | boolean | string | null | void> => {
+): Promise<Problem | object | boolean | null> => {
   if (message.from === "popup") {
     return parseMessageFromPopup(message);
   }
