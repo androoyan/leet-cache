@@ -15,7 +15,7 @@ const Popup = () => {
 
   useEffect(() => {
     const getDataFromBackground = async (): Promise<void> => {
-      const data = await sendBackgroundMessage("popupMounted");
+      const data = await sendBackgroundMessage("popup", "popupMounted");
       if (data.problem !== null) {
         setProblem(data.problem);
         setIsProblemDue(

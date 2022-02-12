@@ -30,6 +30,7 @@ const Edit = () => {
     try {
       if (editProblem !== null) {
         const saved = await sendBackgroundMessage(
+          "edit",
           "updateCardNotes",
           editProblem
         );

@@ -1,3 +1,4 @@
+html,
 body {
   font-family: "Patrick Hand";
 }
@@ -35,7 +36,6 @@ button {
 
 #card-title {
   align-self: center;
-  padding-bottom: 5px;
 }
 
 #card-buttons-container {
@@ -77,4 +77,38 @@ button {
 .card-list-problem-titles {
   list-style-type: square;
   text-align: left;
+}
+
+#card-notes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+
+#show-btn-container {
+  margin-bottom: 3px;
+}
+
+#card-notes-textarea-container {
+  display: flex;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+#card-notes-textarea {
+  resize: none;
+  width: 400px;
+}
+
+#card-notes-buttons-container {
+  display: flex;
+  flex-direction: row;
+  margin-top: 10px;
+}
+
+#hide-notes-btn {
+  margin-left: 5px;
 }

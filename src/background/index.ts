@@ -74,7 +74,7 @@ const getProblemData = async (
       const binaryArr = db.export();
       const gzipArr = pako.gzip(binaryArr);
       const base64Str = base64js.fromByteArray(gzipArr);
-      await browser.storage.local.set({ base64Str });
+      await browser.storage.sync.set({ base64Str });
 
       return <Problem>{ title, difficulty };
     }
@@ -206,9 +206,7 @@ const updateCardReview = async (problem: Problem): Promise<boolean> => {
       ease: ease,
       interval: interval,
     };
-    await updateDatabase(problem.title, params);
-
-    return true;
+    return await updateDatabase(problem.title, params);
   } catch (e) {
     throw e;
   } finally {
@@ -218,7 +216,9 @@ const updateCardReview = async (problem: Problem): Promise<boolean> => {
   }
 };
 
-const openEditPopup = async (editProblem: Problem): Promise<any> => {
+const openEditPopup = async (
+  editProblem: Problem
+): Promise<browser.Windows.Window> => {
   try {
     const popup = await browser.windows.create({
       url: browser.runtime.getURL("edit.html"),
@@ -230,7 +230,7 @@ const openEditPopup = async (editProblem: Problem): Promise<any> => {
     browser.tabs.onUpdated.addListener(
       function listener(tabID, changeInfo) {
         if (popup.tabs !== undefined && popup.tabs[0].id !== undefined) {
-          if (changeInfo.status === "complete" && popup.tabs[0].id === tabID) {
+          if (changeInfo.status === "complete" && tabID === popup.tabs[0].id) {
             browser.tabs.onUpdated.removeListener(listener);
 
             const message: Message = {
@@ -252,12 +252,15 @@ const openEditPopup = async (editProblem: Problem): Promise<any> => {
 
 const updateCardNotes = async (problem: Problem): Promise<boolean> => {
   try {
+    if (problem.notes === undefined || problem.notes === "") {
+      throw new Error("Empty notes!");
+    }
     if (problem.title !== null && problem.notes !== undefined) {
       return await updateDatabase(problem.title, {
         notes: problem.notes,
       });
     }
-    throw new Error("Problem title or notes undefined/null");
+    throw new Error("Error: unable to update notes");
   } catch (e) {
     throw e;
   }
@@ -282,13 +285,21 @@ const parseMessageFromPopup = (
     return Promise.reject(
       new Error("Background: problem is undefined when editing card notes")
     );
-  } else if (message.subject === "updateCardNotes") {
+  }
+  return Promise.reject(
+    new Error(`Background: unexpected message subject '${message.subject}'`)
+  );
+};
+
+const parseMessageFromEdit = (message: Message): Promise<boolean> => {
+  if (message.subject === "updateCardNotes") {
     if (message.problem !== undefined) {
       return updateCardNotes(message.problem);
     }
   }
-
-  return Promise.reject(new Error("Background: unexpected message subject"));
+  return Promise.reject(
+    new Error(`Background: unexpected message subject '${message.subject}'`)
+  );
 };
 
 const parseMessage = (
@@ -296,8 +307,12 @@ const parseMessage = (
 ): Promise<Problem | object | boolean | null> => {
   if (message.from === "popup") {
     return parseMessageFromPopup(message);
+  } else if (message.from === "edit") {
+    return parseMessageFromEdit(message);
   }
-  return Promise.reject(new Error("Background: unexpected message sender"));
+  return Promise.reject(
+    new Error(`Background: unexpected message sender '${message.from}'`)
+  );
 };
 
 browser.runtime.onMessage.addListener(parseMessage);

@@ -8,7 +8,7 @@ import { isEmpty } from "../utils";
 export const getDatabase = async (): Promise<Database> => {
   try {
     const SQL = await initSqlJs();
-    const results = await browser.storage.local.get("base64Str");
+    const results = await browser.storage.sync.get("base64Str");
     if (isEmpty(results)) {
       const database = new SQL.Database();
       database.exec(
@@ -39,7 +39,7 @@ export const updateDatabase = async (
     const binaryArr = db.export();
     const gzipArr = pako.gzip(binaryArr);
     const base64Str = base64js.fromByteArray(gzipArr);
-    await browser.storage.local.set({ base64Str });
+    await browser.storage.sync.set({ base64Str });
     return true;
   } catch (e) {
     throw e;

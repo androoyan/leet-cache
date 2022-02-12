@@ -1,3 +1,4 @@
+import CardNotes from "./CardNotes";
 import { Problem } from "../../types";
 import { sendBackgroundMessage } from "../utils";
 
@@ -15,24 +16,29 @@ const Card = ({
         title: problem.title,
         difficulty: target.value,
       };
-      await sendBackgroundMessage("updateCardReview", updatedProblem);
-      reviewedCard(problem.title);
+      const updated = await sendBackgroundMessage(
+        "popup",
+        "updateCardReview",
+        updatedProblem
+      );
+      if (updated) {
+        reviewedCard(problem.title);
+      }
     } catch (e) {
       alert(e);
     }
   };
 
-  const editCard = async () => {
-    const editProblem: Problem = { title: problem.title, notes: problem.notes };
-    await sendBackgroundMessage("editProblemNotes", editProblem);
-    //const popup = window.open(
-    //  browser.runtime.getURL("popup.html"),
-    //  "HELLO",
-    //  "width=400,height=400"
-    //);
-    //if (popup !== null) {
-    //  popup.document.write(ReactDOMServer.renderToString(<Header />));
-    //}
+  const openEditPopup = async () => {
+    try {
+      const editProblem: Problem = {
+        title: problem.title,
+        notes: problem.notes,
+      };
+      await sendBackgroundMessage("popup", "editProblemNotes", editProblem);
+    } catch (e) {
+      alert(e);
+    }
   };
 
   return (
@@ -40,6 +46,8 @@ const Card = ({
       <div id="card-title">
         <h2>{problem.title}</h2>
       </div>
+
+      <CardNotes notes={problem.notes} editNotes={openEditPopup} />
 
       <div id="card-buttons-container">
         <button
@@ -70,9 +78,6 @@ const Card = ({
           Easy
         </button>
       </div>
-      <button type="button" onClick={editCard}>
-        EDIT
-      </button>
     </div>
   );
 };
