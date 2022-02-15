@@ -7,7 +7,7 @@ const Options = () => {
     );
 
     if (confirmation) {
-      browser.storage.local
+      browser.storage.sync
         .clear()
         .then(() => alert("Extension was reset succesfully!"))
         .catch(() => alert("Reset was unsuccessful, not all data was removed."));
