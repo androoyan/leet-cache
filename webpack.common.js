@@ -29,12 +29,6 @@ module.exports = {
     ],
   },
   resolve: {
-    alias: {
-      "sql.js": path.resolve(
-        process.cwd(),
-        "./node_modules/sql.js/dist/sql-wasm.js"
-      ),
-    },
     extensions: [".ts", ".tsx", ".js"],
     fallback: {
       crypto: false,
@@ -59,11 +53,7 @@ module.exports = {
       template: "./src/popup/index.html",
     }),
     new CopyWebpackPlugin({
-      patterns: [
-        { from: "./src/manifest.json" },
-        { from: "./src/assets", to: "assets" },
-        { from: "./node_modules/sql.js/dist/sql-wasm.wasm" },
-      ],
+      patterns: [{ from: "./src/assets", to: "assets" }],
     }),
   ],
   output: {
