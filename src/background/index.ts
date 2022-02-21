@@ -74,7 +74,7 @@ const getProblemData = async (
       const binaryArr = db.export();
       const gzipArr = pako.gzip(binaryArr);
       const base64Str = base64js.fromByteArray(gzipArr);
-      await browser.storage.sync.set({ base64Str });
+      await browser.storage.local.set({ base64Str });
 
       return <Problem>{ title, difficulty };
     }

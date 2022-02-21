@@ -7,7 +7,7 @@ const Options = () => {
     );
 
     if (confirmation) {
-      browser.storage.sync
+      browser.storage.local
         .clear()
         .then(() => alert("Extension was reset succesfully!"))
         .catch(() => alert("Reset was unsuccessful, not all data was removed."));
@@ -16,15 +16,17 @@ const Options = () => {
 
   return (
     <div className="options-container">
-      <span>Press button to reset extension data: </span>
-      <button
-        type="button"
-        id="btn-reset"
-        className="btn-options"
-        onClick={handleReset}
-      >
-        Reset
-      </button>
+      <div className="reset-container">
+        <span>Reset extension data: </span>
+        <button
+          type="button"
+          id="btn-reset"
+          className="btn-options"
+          onClick={handleReset}
+        >
+          Reset
+        </button>
+      </div>
     </div>
   );
 };
