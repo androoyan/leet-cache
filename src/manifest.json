@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Leet Cache",
-  "version": "1.0.2",
+  "version": null,
   "description": "Utilize spaced repetiton to efficiently 'grind' LeetCode problems.",
   "icons": {
     "32": "assets/icons/leet-cache-32x32.png",
