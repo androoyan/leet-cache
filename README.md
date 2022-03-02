@@ -1,7 +1,9 @@
 <div align="center">
   <img src="https://github.com/axyan/leet-cache/blob/main/src/assets/icons/leet-cache-96x96.png" width="75" height="75"/>
   <h1>Leet Cache</h1>
-  <img alt="Mozilla Add-on" src="https://img.shields.io/amo/v/leet-cache?logo=firefox&style=for-the-badge&label=Firefox%20add-on">
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/leet-cache/">
+    <img alt="Mozilla Add-on" src="https://img.shields.io/amo/v/leet-cache?logo=firefox&style=for-the-badge&label=Firefox%20add-on">
+  </a>
 </div>
 
 <br/>
