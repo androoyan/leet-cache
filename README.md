@@ -33,7 +33,7 @@ npm run start
 
 To use development extension, open a new Firefox browser and go to
 'about:debugging'. Navigate to 'This Firefox' and select 'Load Temporary
-Add-on...'. Locate and open manifest.json found in the /dist directory.
+Add-on'. Locate and open manifest.json found in the /dist directory.
 
 ## Build
 
