@@ -3,7 +3,7 @@
   "version": "1.0.2",
   "description": "Utilize spaced repetiton to efficiently 'grind' LeetCode problems.",
   "private": true,
-  "license": "AGPL-3.0-or-later",
+  "license": "GPL-3.0-or-later",
   "scripts": {
     "build": "webpack --config webpack.prod.js",
     "start": "webpack --watch --config webpack.dev.js"
